@@ -25,12 +25,6 @@ A modular and interactive web scraping project built with Python and Pygame. Thi
   - **Loading Screen**: Displays an animated "Loading..." message during the scraping process.
   - **CSV Generation Screen**: Displays the scraped product data, complete with scrolling functionality.
 
-- **Cyan Close Button**:
-  - A convenient close button (top-right corner) for quick program termination, with hover effects for better user interaction.
-
-- **Mouse Scrolling**:
-  - Smooth scrolling feature to navigate through scraped product listings.
-
 - **Dynamic Scraping**:
   - Retrieves product titles, prices, and ratings from the web and saves the data in a CSV file for easy access.
 
