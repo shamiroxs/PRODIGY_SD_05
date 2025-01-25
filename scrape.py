@@ -6,30 +6,24 @@ from bs4 import BeautifulSoup
 import requests
 import os
 
-# Initialize Pygame
 pygame.init()
 
-# Screen Dimensions and Colors
 WIDTH, HEIGHT = 800, 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 CYAN = (0, 255, 255)
 GREY = (105, 105, 105)
 
-# Fonts
 TITLE_FONT = pygame.font.Font(None, 64)
 TEXT_FONT = pygame.font.Font(None, 36)
 TITLE_HEIGHT = 124
 
-# File Paths
 URL_FILE = "url.txt"
 OUTPUT_FILE = "information.txt"
 
-# Screen Setup
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Web Scraping")
 
-# Scroll offset to handle mouse wheel scrolling
 scroll_offset = 0
 
 def load_url():
@@ -65,17 +59,14 @@ def scrape_products(url):
 
     for product in product_containers:
         try:
-            # Extract product title
             title_element = product.find(
                 "h2", class_="a-size-base-plus a-spacing-none a-color-base a-text-normal"
             )
             title = title_element.text.strip() if title_element else "N/A"
             
-            # Extract product price
             price_element = product.find("span", class_="a-offscreen")
             price = price_element.text.strip() if price_element else "N/A"
-            
-            # Extract product rating
+
             rating_element = product.find("span", class_="a-icon-alt")
             rating = rating_element.text.strip() if rating_element else "N/A"
 
@@ -100,7 +91,6 @@ def wrap_text(text, font, max_width):
     current_line = words[0]
 
     for word in words[1:]:
-        # Check if adding the word would exceed the max_width
         test_line = current_line + " " + word
         if font.size(test_line)[0] <= max_width:
             current_line = test_line
@@ -108,66 +98,56 @@ def wrap_text(text, font, max_width):
             lines.append(current_line)
             current_line = word
     
-    lines.append(current_line)  # Add the last line
+    lines.append(current_line) 
     return lines
 
 def display_results(products):
     """Display the scraped results on the screen with scroll functionality."""
     screen.fill(BLACK)
-    y_offset = 100 + scroll_offset  # Add scroll offset to the vertical position
+    y_offset = 100 + scroll_offset  
 
-    # Display each product's title, price, and rating with labels
     for i, product in enumerate(products, start=1):
-        # Display the "PRODUCT X" label
         label_text = f"PRODUCT {i}"
         label_surface = TEXT_FONT.render(label_text, True, WHITE)
         screen.blit(label_surface, (50, y_offset))
         y_offset += 40
 
-        # Wrap and display the title, price, and rating for each product
         title_lines = wrap_text("Title: " + product[0], TEXT_FONT, WIDTH - 100)
         price_lines = wrap_text("Price: " + product[1], TEXT_FONT, WIDTH - 100)
         rating_lines = wrap_text("Rating: " + product[2], TEXT_FONT, WIDTH - 100)
         
-        # Display the title
         for line in title_lines:
             title_surface = TEXT_FONT.render(line, True, WHITE)
             screen.blit(title_surface, (50, y_offset))
             y_offset += 40
-        
-        # Display the price
+
         for line in price_lines:
             price_surface = TEXT_FONT.render(line, True, WHITE)
             screen.blit(price_surface, (50, y_offset))
             y_offset += 40
         
-        # Display the rating
         for line in rating_lines:
             rating_surface = TEXT_FONT.render(line, True, WHITE)
             screen.blit(rating_surface, (50, y_offset))
             y_offset += 40
 
-        # Add some spacing between products
         y_offset += 20
 
-    # Draw the '>' button with hover effect
     button_rect = pygame.Rect(WIDTH - 50, 10, 40, 40)  # Button at top-right
     mouse_x, mouse_y = pygame.mouse.get_pos()
     
-    # Check if the mouse is hovering over the button
     if button_rect.collidepoint(mouse_x, mouse_y):
-        pygame.draw.rect(screen, GREY, button_rect)  # Cyan button on hover
+        pygame.draw.rect(screen, GREY, button_rect)  
     else:
-        pygame.draw.rect(screen, CYAN, button_rect)  # Grey button by default
+        pygame.draw.rect(screen, CYAN, button_rect)  
     
-    # Draw the '>' text in the button
     button_text = TEXT_FONT.render(">", True, BLACK)
     text_rect = button_text.get_rect(center=button_rect.center)
     screen.blit(button_text, text_rect)
     
     pygame.display.flip()
 
-    return button_rect  # Return the button rect for click detection
+    return button_rect  
 
 def main():
     """Main function for scraping and displaying product data."""
@@ -180,7 +160,6 @@ def main():
         print("Error: 'url.txt' not found or empty.")
         sys.exit()
 
-    # Remove existing CSV file if it exists
     if os.path.exists(OUTPUT_FILE):
         os.remove(OUTPUT_FILE)
 
@@ -194,37 +173,31 @@ def main():
                 pygame.quit()
                 sys.exit()
 
-        # Display loading animation
         if time.time() - start_time > 0.5:
             blink = not blink
             start_time = time.time()
 
         display_loading(blink)
 
-        # Perform scraping in the background
         products = scrape_products(url)
         if products:
             save_to_csv(products)
             loading = False
 
-    # Display results after scraping is complete
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-            # Handle mouse wheel scroll
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 4:  # Scroll up
-                    scroll_offset += 30  # Scroll up by 30 pixels
-                elif event.button == 5:  # Scroll down
-                    scroll_offset -= 30  # Scroll down by 30 pixels
+                if event.button == 4:  
+                    scroll_offset += 30  
+                elif event.button == 5:  
+                    scroll_offset -= 30  
 
-        # Display results and '>' button
         button_rect = display_results(products)
         
-        # Check if the '>' button is clicked to close the program
         if event.type == pygame.MOUSEBUTTONDOWN:
             if button_rect.collidepoint(event.pos):
                 return  "user_keyword"
